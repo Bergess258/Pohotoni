@@ -15,7 +15,7 @@ namespace SuhovLab1
             Tree tree=new Tree();
             StreamReader Reader = new StreamReader("input.txt");
             string varReg = @"(int||sbyte||short||long||byte||ushort||uint||ulong||char||float||double||decimal||bool||object||string)";
-            Regex vars = new Regex(varReg+@"(\[\]||\[\,\])(\s)\D\w*(\;)");
+            Regex vars = new Regex(@"^"+varReg+@"(\[\]||\[\,\])(\s)\D\w*(\;)");
             Regex type = new Regex(varReg);
             Regex var = new Regex(@"\D\w*\s*\=\s*\d+\;");
             Regex Class = new Regex(@"class\s\D\w*\;");
@@ -32,8 +32,7 @@ namespace SuhovLab1
                 {
                     break;
                 }
-                
-                masLine[masLine.Length - 1].Remove(masLine[masLine.Length - 1].Length - 1);
+                masLine[masLine.Length - 1]=masLine[masLine.Length - 1].Remove(masLine[masLine.Length - 1].Length - 1);
                 if (vars.IsMatch(line))
                 {
                     tree.Add(new Var(masLine[1], masLine[0]));
@@ -47,12 +46,7 @@ namespace SuhovLab1
                             string s = "";
                             for (int i = 2; i < masLine.Length; i++)
                                 s += masLine[i];
-
-                            if (var.IsMatch(s))
-                            {
-                                tree.Add(new Const(masLine[2], masLine[1], masLine[masLine.Length - 1]));
-                            }
-
+                            tree.Add(new Const(masLine[2], masLine[1], masLine[masLine.Length - 1]));
                         }
                     }
                     else
@@ -81,7 +75,7 @@ namespace SuhovLab1
                                 for (int i = 1; i < temp.Length; i++)
                                 {
                                     string[] s1 = temp[i].Split(' ');
-                                    if (s.Length == 3)
+                                    if (s.Length == 4)
                                         paramsMet.Add(s1[0], s1[1]);
                                     else
                                         paramsMet.Add("var", s1[1]);
@@ -93,7 +87,7 @@ namespace SuhovLab1
                         }
                         else
                         {
-                            Console.WriteLine("PolniyPizdec");
+                            Console.WriteLine("Найдено не совпадение");
                         }
                     }
                 }

@@ -11,6 +11,7 @@ namespace SuhovLab1
         public string Name;
         public int hash;
         public string type;
+        public string id;
         public int Hash
         {
             get { return hash; }
@@ -36,7 +37,13 @@ namespace SuhovLab1
         {
             Name = name;
             type = Type;
+            if (val[0] == '\''|| val[0] == '\"')
+            {
+                val = val.Remove(val.Length - 1);
+                val = val.Remove(0);
+            }
             Value = val;
+            id = "Const";
             CalcHash();
         }
         public override void CalcHash()
@@ -58,6 +65,7 @@ namespace SuhovLab1
             Name = name;
             type = "";
             CalcHash();
+            id = "Class";
         }
         public override string ToString()
         {
@@ -71,6 +79,7 @@ namespace SuhovLab1
             Name = name;
             type = Type;
             CalcHash();
+            id = "Var";
         }
         public override string ToString()
         {
@@ -86,6 +95,7 @@ namespace SuhovLab1
             type = Type;
             this.param = param;
             CalcHash();
+            id = "Method";
         }
         public Method(string name, string Type)
         {
@@ -95,7 +105,7 @@ namespace SuhovLab1
         }
         public override string ToString()
         {
-            return Name + " | " + hash + " | " + "CONSTS" + " | " + type + "_type" + " | " + param.ToString();
+            return Name + " | " + hash + " | " + "Method" + " | " + type + "_type" + " | " + param.ToString();
         }
     }
 }
