@@ -10,8 +10,9 @@ namespace SuhovLab1
     {
         public string Name;
         public int hash;
-        public string type;
         public string id;
+        public string type;
+        
         public int Hash
         {
             get { return hash; }
@@ -43,7 +44,7 @@ namespace SuhovLab1
                 val = val.Remove(0);
             }
             Value = val;
-            id = "Const";
+            id = "CONST";
             CalcHash();
         }
         public override void CalcHash()
@@ -63,9 +64,9 @@ namespace SuhovLab1
         public Class(string name)
         {
             Name = name;
-            type = "";
             CalcHash();
-            id = "Class";
+            id = "CLASSES";
+            type = "class";
         }
         public override string ToString()
         {
@@ -79,7 +80,7 @@ namespace SuhovLab1
             Name = name;
             type = Type;
             CalcHash();
-            id = "Var";
+            id = "VAR";
         }
         public override string ToString()
         {
@@ -95,7 +96,7 @@ namespace SuhovLab1
             type = Type;
             this.param = param;
             CalcHash();
-            id = "Method";
+            id = "METHOD";
         }
         public Method(string name, string Type)
         {

@@ -9,12 +9,12 @@ namespace SuhovLab1
     class NList
     {
         string type;
-        string param;
+        string method;
         NList next;
         public NList(string t,string p)
         {
             type = t;
-            param = p;
+            method = p;
         }
         public void Add(string t,string p)
         {
@@ -31,10 +31,11 @@ namespace SuhovLab1
             NList temp = this;
             while (true)
             {
-                if (temp.next == null) break;
-                s += temp.param + " | " + temp.type;
+                if (temp == null) break;
+                s += temp.method + " " + temp.type+ " |";
                 temp = temp.next;
             }
+            s = s.Remove(s.Length - 1);
             return s;
         }
     }
