@@ -103,6 +103,7 @@ namespace SuhovLab1
             Name = name;
             type = Type;
             CalcHash();
+            id = "METHOD";
         }
         public override string ToString()
         {
