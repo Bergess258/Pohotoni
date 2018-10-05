@@ -64,9 +64,9 @@ namespace SuhovLab1
         public Class(string name)
         {
             Name = name;
-            CalcHash();
             id = "CLASSES";
             type = "class";
+            CalcHash();
         }
         public override string ToString()
         {
