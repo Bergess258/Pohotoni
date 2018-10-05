@@ -6,11 +6,18 @@ using System.Threading.Tasks;
 
 namespace SuhovLab1
 {
+    enum Id
+    {
+        CONST = 1,
+        VAR,
+        METHOD,
+        CLASS
+    }
     class IDent
     {
         public string Name;
         public int hash;
-        public string id;
+        public Id id;
         public string type;
         
         public int Hash
@@ -33,7 +40,7 @@ namespace SuhovLab1
     }
     class Const : IDent
     {
-        string Value;
+        object Value;
         public Const(string name, string Type,string val)
         {
             Name = name;
@@ -44,7 +51,7 @@ namespace SuhovLab1
                 val = val.Remove(0);
             }
             Value = val;
-            id = "CONST";
+            id = Id.CONST;
             CalcHash();
         }
         public override void CalcHash()
@@ -64,7 +71,7 @@ namespace SuhovLab1
         public Class(string name)
         {
             Name = name;
-            id = "CLASSES";
+            id = Id.CLASS;
             type = "class";
             CalcHash();
         }
@@ -80,7 +87,7 @@ namespace SuhovLab1
             Name = name;
             type = Type;
             CalcHash();
-            id = "VAR";
+            id = Id.VAR;
         }
         public override string ToString()
         {
@@ -96,7 +103,7 @@ namespace SuhovLab1
             type = Type;
             this.param = param;
             CalcHash();
-            id = "METHOD";
+            id = Id.METHOD;
         }
         public Method(string name, string Type)
         {

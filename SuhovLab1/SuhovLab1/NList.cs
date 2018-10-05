@@ -13,8 +13,8 @@ namespace SuhovLab1
         NList next;
         public NList(string t,string p)
         {
-            type = t;
-            method = p;
+            type = p;
+            method = t;
         }
         public void Add(string t,string p)
         {
