@@ -13,12 +13,17 @@ namespace SuhovLab1
         METHOD,
         CLASS
     }
+    enum Type
+    {
+        int_type, sbyte_type, short_type, long_type, byte_type, ushort_type, uint_type, ulong_type,
+        char_type, float_type, double_type, decimal_type, bool_type, object_type, string_type,class_type
+    }
     class IDent
     {
         public string Name;
         public int hash;
         public Id id;
-        public string type;
+        public Type type;
         
         public int Hash
         {
@@ -31,7 +36,7 @@ namespace SuhovLab1
             {
                 a += s;
             }
-            foreach (char s in type)
+            foreach (char s in type.ToString())
             {
                 a += s;
             }
@@ -41,10 +46,10 @@ namespace SuhovLab1
     class Const : IDent
     {
         object Value;
-        public Const(string name, string Type,string val)
+        public Const(string name, string typeI,string val)
         {
             Name = name;
-            type = Type;
+            type = (Type)Enum.Parse(typeof(Type), typeI+"_type"); ;
             if (val[0] == '\''|| val[0] == '\"')
             {
                 val = val.Remove(val.Length - 1);
@@ -72,7 +77,7 @@ namespace SuhovLab1
         {
             Name = name;
             id = Id.CLASS;
-            type = "class";
+            type = Type.class_type;
             CalcHash();
         }
         public override string ToString()
@@ -82,10 +87,10 @@ namespace SuhovLab1
     }
     class Var : IDent
     {
-        public Var(string name,string Type)
+        public Var(string name,string typeI)
         {
             Name = name;
-            type = Type;
+            type = (Type)Enum.Parse(typeof(Type), typeI + "_type");
             CalcHash();
             id = Id.VAR;
         }
@@ -97,18 +102,18 @@ namespace SuhovLab1
     class Method : IDent
     {
         NList param;
-        public Method(string name, string Type,NList param)
+        public Method(string name, string typeI,NList param)
         {
             Name = name;
-            type = Type;
+            type = (Type)Enum.Parse(typeof(Type), typeI + "_type");
             this.param = param;
             CalcHash();
             id = Id.METHOD;
         }
-        public Method(string name, string Type)
+        public Method(string name, string typeI)
         {
             Name = name;
-            type = Type;
+            type = (Type)Enum.Parse(typeof(Type), typeI + "_type");
             CalcHash();
         }
         public override string ToString()
