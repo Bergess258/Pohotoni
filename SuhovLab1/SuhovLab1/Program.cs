@@ -75,8 +75,8 @@ namespace SuhovLab1
                                 for (int i = 1; i < temp.Length; i++)
                                 {
                                     string[] s1 = temp[i].Split(' ');
-                                    if (s.Length == 4)
-                                        paramsMet.Add(s1[0], s1[1]);
+                                    if (s1.Length == 4)
+                                        paramsMet.Add(s1[1], s1[2]);
                                     else
                                         paramsMet.Add("var", s1[1]);
                                 }
