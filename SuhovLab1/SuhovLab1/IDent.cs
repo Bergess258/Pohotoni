@@ -8,7 +8,7 @@ namespace SuhovLab1
 {
     enum Id
     {
-        CONST = 1,
+        CONST,
         VAR,
         METHOD,
         CLASS
