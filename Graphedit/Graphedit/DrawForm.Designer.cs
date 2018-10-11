@@ -36,13 +36,14 @@
             // 
             this.pB.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pB.Location = new System.Drawing.Point(0, 0);
-            this.pB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pB.Margin = new System.Windows.Forms.Padding(2);
             this.pB.Name = "pB";
             this.pB.Size = new System.Drawing.Size(600, 366);
             this.pB.TabIndex = 0;
             this.pB.TabStop = false;
             this.pB.SizeModeChanged += new System.EventHandler(this.pictureBox1_SizeModeChanged);
             this.pB.SizeChanged += new System.EventHandler(this.pictureBox1_SizeChanged);
+            this.pB.Click += new System.EventHandler(this.pB_Click);
             this.pB.Paint += new System.Windows.Forms.PaintEventHandler(this.pB_Paint);
             this.pB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseDown);
             this.pB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
@@ -54,7 +55,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(600, 366);
             this.Controls.Add(this.pB);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "DrawForm";
             this.Text = "DrawForm";
             this.Load += new System.EventHandler(this.DrawForm_Load);
