@@ -29,16 +29,19 @@
         private void InitializeComponent()
         {
             this.pB = new System.Windows.Forms.PictureBox();
+            this.panel1 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pB)).BeginInit();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // pB
             // 
-            this.pB.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pB.BackColor = System.Drawing.Color.White;
             this.pB.Location = new System.Drawing.Point(0, 0);
             this.pB.Margin = new System.Windows.Forms.Padding(2);
             this.pB.Name = "pB";
             this.pB.Size = new System.Drawing.Size(600, 366);
+            this.pB.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pB.TabIndex = 0;
             this.pB.TabStop = false;
             this.pB.SizeModeChanged += new System.EventHandler(this.pictureBox1_SizeModeChanged);
@@ -49,17 +52,33 @@
             this.pB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
             this.pB.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pB_MouseUp);
             // 
+            // panel1
+            // 
+            this.panel1.AutoScroll = true;
+            this.panel1.Controls.Add(this.pB);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(600, 366);
+            this.panel1.TabIndex = 1;
+            // 
             // DrawForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(600, 366);
-            this.Controls.Add(this.pB);
+            this.Controls.Add(this.panel1);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "DrawForm";
             this.Text = "DrawForm";
             this.Load += new System.EventHandler(this.DrawForm_Load);
+            this.ResizeBegin += new System.EventHandler(this.DrawForm_ResizeBegin);
+            this.ResizeEnd += new System.EventHandler(this.DrawForm_ResizeEnd);
+            this.Enter += new System.EventHandler(this.DrawForm_Enter);
+            this.StyleChanged += new System.EventHandler(this.DrawForm_StyleChanged);
             ((System.ComponentModel.ISupportInitialize)(this.pB)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -67,5 +86,6 @@
         #endregion
 
         private System.Windows.Forms.PictureBox pB;
+        private System.Windows.Forms.Panel panel1;
     }
 }
