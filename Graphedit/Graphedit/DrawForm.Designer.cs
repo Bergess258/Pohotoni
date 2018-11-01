@@ -75,6 +75,7 @@
             this.ResizeBegin += new System.EventHandler(this.DrawForm_ResizeBegin);
             this.ResizeEnd += new System.EventHandler(this.DrawForm_ResizeEnd);
             this.Enter += new System.EventHandler(this.DrawForm_Enter);
+            this.Resize += new System.EventHandler(this.DrawForm_Resize);
             this.StyleChanged += new System.EventHandler(this.DrawForm_StyleChanged);
             ((System.ComponentModel.ISupportInitialize)(this.pB)).EndInit();
             this.panel1.ResumeLayout(false);

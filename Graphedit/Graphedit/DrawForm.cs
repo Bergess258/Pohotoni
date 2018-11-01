@@ -16,12 +16,12 @@ namespace Graphedit
         Point curPos = new Point(0,0);
         float currentScale = 1;
         static Color foreColor = Color.Black;
-        static int lineWidth = 2;
+        static float lineWidth = 2;
         string selectedTool = "Pencil";
         public string fileName="";
         Pen pen = new Pen(foreColor, lineWidth);
         Pen er = new Pen(Color.White,lineWidth);
-        Bitmap bmp,tempBmp,sizeChanged;
+        Bitmap bmp,tempBmp;
         Graphics g;
         bool ok = false;
 
@@ -230,12 +230,12 @@ namespace Graphedit
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            int z = (int)(Width * currentScale), f = (int)(Screen.PrimaryScreen.Bounds.Width * currentScale);
             tempBmp = (Bitmap)bmp.Clone();
             if (selectedTool == "plus")
             {
-                sizeChanged = (Bitmap)bmp.Clone();
                 currentScale *= (float)2;
+                pen = new Pen(foreColor, lineWidth*currentScale);
+                er = new Pen(Color.White, lineWidth* currentScale);
                 bmpH = (int)(Height * currentScale);
                 bmpW = (int)(Width * currentScale);
                 bmp = new Bitmap(tempBmp, new Size(bmpW,bmpH));
@@ -246,8 +246,9 @@ namespace Graphedit
             else
             if (selectedTool == "minus")
             {
-                sizeChanged = (Bitmap)bmp.Clone();
-                currentScale *= (float)0.5;
+                currentScale /= 2;
+                pen = new Pen(foreColor, lineWidth * currentScale);
+                er = new Pen(Color.White, lineWidth * currentScale);
                 bmpH = (int)(Height * currentScale);
                 bmpW = (int)(Width * currentScale);
                 bmp = new Bitmap(tempBmp, new Size(bmpW, bmpH));
@@ -283,7 +284,7 @@ namespace Graphedit
 
         private void DrawForm_StyleChanged(object sender, EventArgs e)
         {
-            //if(WindowState== System.Windows.Forms.FormWindowState.Maximized)
+            //if (WindowState == System.Windows.Forms.FormWindowState.Maximized)
             //{
             //    ok = true;
             //    bmp = new Bitmap(bmp, new Size((int)(Width * currentScale), (int)(Height * currentScale)));
@@ -311,6 +312,20 @@ namespace Graphedit
         private void DrawForm_Enter(object sender, EventArgs e)
         {
 
+        }
+
+        private void DrawForm_Resize(object sender, EventArgs e)
+        {
+            int z = (int)(Width * currentScale), f = (int)(Screen.PrimaryScreen.Bounds.Width * currentScale), z2 = (int)(Height * currentScale), f2 = (int)(Screen.PrimaryScreen.Bounds.Height * currentScale);
+            if (z>f|| z2>f2)
+            {
+                bmp = new Bitmap(tempBmp, new Size((int)(Width * currentScale), (int)(Height * currentScale)));
+                pB.Image = bmp;
+                pB.Refresh();
+                g = Graphics.FromImage(bmp);
+                curH = Height;
+                curW = Width;
+            }
         }
 
         private void DrawForm_ResizeEnd(object sender, EventArgs e)
@@ -352,8 +367,8 @@ namespace Graphedit
             selectedTool = str;
             lineWidth = stre;
             foreColor = col;
-            pen = new Pen(foreColor, lineWidth);
-            er = new Pen(Color.White, lineWidth);
+            pen = new Pen(foreColor, lineWidth * currentScale);
+            er = new Pen(Color.White, lineWidth * currentScale);
         }
         public void SizeBack()
         {
