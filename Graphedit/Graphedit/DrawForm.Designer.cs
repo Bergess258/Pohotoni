@@ -70,7 +70,8 @@
             this.Controls.Add(this.panel1);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "DrawForm";
-            this.Text = "DrawForm";
+            this.Text = "Окно редактирования";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DrawForm_FormClosing);
             this.Load += new System.EventHandler(this.DrawForm_Load);
             this.ResizeBegin += new System.EventHandler(this.DrawForm_ResizeBegin);
             this.ResizeEnd += new System.EventHandler(this.DrawForm_ResizeEnd);

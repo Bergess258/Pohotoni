@@ -14,7 +14,7 @@ namespace Graphedit
     {
         int old_x,old_Y,curW,curH,bmpW,bmpH;
         Point curPos = new Point(0,0);
-        float currentScale = 1;
+        float currentScale = 1,sizeChangedW=1,sizeChangedH;
         static Color foreColor = Color.Black;
         static float lineWidth = 2;
         string selectedTool = "Pencil";
@@ -24,17 +24,29 @@ namespace Graphedit
         Bitmap bmp,tempBmp;
         Graphics g;
         bool ok = false;
+        int WindowNumb;
 
         private Form1 parental;
-        public DrawForm(Form1 par)
+        public DrawForm(Form1 par,int numb,int w,int h)
         {
             parental = par;
+            WindowNumb = numb;
             InitializeComponent();
+            Text += " "+(numb+1);
+            Width = w;
+            Height = h;
         }
-        
+        public DrawForm(Form1 par, int numb)
+        {
+            parental = par;
+            WindowNumb = numb;
+            InitializeComponent();
+            Text += " " + (numb + 1);
+        }
         private void DrawForm_Load(object sender, EventArgs e)
         {
-            bmp = new Bitmap(pB.Width, pB.Height);
+            bmp = new Bitmap(Width, Height);
+            tempBmp = new Bitmap(bmp);
             pB.Image = bmp;
             g = Graphics.FromImage(bmp);
             selectedTool = parental.selectedTool;
@@ -42,6 +54,17 @@ namespace Graphedit
             curW = Width;
             bmpH = Height;
             bmpW = Width;
+        }
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_NCLBUTTONDOWN = 0x00A1;
+            base.WndProc(ref m);
+            switch (m.Msg)
+            {
+                case WM_NCLBUTTONDOWN:
+                    parental.lastWind(WindowNumb);
+                    return;
+            }
         }
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
@@ -261,6 +284,7 @@ namespace Graphedit
                 old_x = e.X;
                 old_Y = e.Y;
             }
+            parental.lastWind(WindowNumb);
         }
 
         private void pB_Paint(object sender, PaintEventArgs e)
@@ -274,12 +298,12 @@ namespace Graphedit
 
         private void pictureBox1_SizeChanged(object sender, EventArgs e)
         {
-            if (bmp != null&&(curH!=Height||curW!=Width))
-            {
-                bmp = new Bitmap(tempBmp, new Size((int)(Width * currentScale), (int)(Height * currentScale)));
-                pB.Image = bmp;
-                pB.Refresh();
-            }
+            //if (bmp != null&&(curH!=Height||curW!=Width))
+            //{
+            //    bmp = new Bitmap(tempBmp, new Size((int)(Width * currentScale), (int)(Height * currentScale)));
+            //    pB.Image = bmp;
+            //    pB.Refresh();
+            //}
         }
 
         private void DrawForm_StyleChanged(object sender, EventArgs e)
@@ -301,6 +325,7 @@ namespace Graphedit
             //        pB.Refresh();
             //    }
             //}
+            parental.lastWind(WindowNumb);
         }
 
         public void Save(string _path)
@@ -311,15 +336,15 @@ namespace Graphedit
 
         private void DrawForm_Enter(object sender, EventArgs e)
         {
-
+            parental.lastWind(WindowNumb);
         }
 
         private void DrawForm_Resize(object sender, EventArgs e)
         {
             int z = (int)(Width * currentScale), f = (int)(Screen.PrimaryScreen.Bounds.Width * currentScale), z2 = (int)(Height * currentScale), f2 = (int)(Screen.PrimaryScreen.Bounds.Height * currentScale);
-            if (z>f|| z2>f2)
+            if (bmp!=null&&(z>f|| z2>f2||curW>f))
             {
-                bmp = new Bitmap(tempBmp, new Size((int)(Width * currentScale), (int)(Height * currentScale)));
+                bmp = new Bitmap(bmp, new Size((int)(Width * currentScale), (int)(Height * currentScale)));
                 pB.Image = bmp;
                 pB.Refresh();
                 g = Graphics.FromImage(bmp);
@@ -335,6 +360,9 @@ namespace Graphedit
                 bmp = new Bitmap(tempBmp, new Size((int)(Width * currentScale), (int)(Height * currentScale)));
                 pB.Image = bmp;
                 pB.Refresh();
+                sizeChangedW = (float)(1.0*Width / curW);
+                sizeChangedH = (float)(1.0 * Height / curH);
+                updateTool();
                 g = Graphics.FromImage(bmp);
                 curH = Height;
                 curW = Width;
@@ -344,6 +372,14 @@ namespace Graphedit
         private void DrawForm_ResizeBegin(object sender, EventArgs e)
         {
             tempBmp = (Bitmap)bmp.Clone();
+            parental.lastWind(WindowNumb);
+            curH = Height;
+            curW = Width;
+        }
+
+        private void DrawForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            parental.ClosingDraw(WindowNumb);
         }
 
         public void Save()
@@ -358,6 +394,9 @@ namespace Graphedit
             Graphics ddos = Graphics.FromImage(tmp);
             ddos.DrawImage(bmp,new Rectangle(0,0,tmp.Width,tmp.Height),0,0,tmp.Width,tmp.Height,GraphicsUnit.Pixel);
             bmp = tmp;
+            tempBmp = new Bitmap(bmp);
+            Width = tmp.Width+20;
+            Height = tmp.Height+20;
             pB.Image = bmp;
             pB.Refresh();
             g = Graphics.FromImage(bmp);
@@ -367,8 +406,12 @@ namespace Graphedit
             selectedTool = str;
             lineWidth = stre;
             foreColor = col;
-            pen = new Pen(foreColor, lineWidth * currentScale);
-            er = new Pen(Color.White, lineWidth * currentScale);
+            updateTool();
+        }
+        private void updateTool()
+        {
+            pen = new Pen(foreColor, lineWidth * currentScale*sizeChangedW* sizeChangedH);
+            er = new Pen(Color.White, lineWidth * currentScale * sizeChangedW* sizeChangedH);
         }
         public void SizeBack()
         {
@@ -376,6 +419,16 @@ namespace Graphedit
             bmp = new Bitmap(bmp, new Size(Width,Height));
             pB.Image = bmp;
             pB.Refresh();
+        }
+        public void SetFilter(Color Set)
+        {
+            //Bitmap temp = new Bitmap(bmpW, bmpH);
+            g.FillRectangle(new SolidBrush(Color.FromArgb(100, Set)), 0, 0, bmpW, bmpH);
+            pB.Refresh();
+        }
+        public void ChangeNumb(int num)
+        {
+            WindowNumb = num;
         }
     }
 }

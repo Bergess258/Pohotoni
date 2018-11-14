@@ -15,6 +15,7 @@ namespace Graphedit
         public string selectedTool = "Pencil";
         int valueP=2,valueM=200,value=2;
         Color color = Color.Black;
+        int lastform = 0;
         List<DrawForm> drawForms = new List<DrawForm>();
         public Form1()
         {
@@ -29,9 +30,8 @@ namespace Graphedit
 
         private void создатьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DrawForm subform = new DrawForm(this);
-            drawForms.Add(subform);
-            subform.Show();
+            sizeForm n = new sizeForm(this);
+            n.Show();
         }
 
         private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
@@ -63,9 +63,9 @@ namespace Graphedit
 
         private void открытьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DrawForm subform = new DrawForm(this);
+            DrawForm subform = new DrawForm(this, drawForms.Count);
+            lastform = drawForms.Count;
             drawForms.Add(subform);
-            subform.MdiParent = this;
             subform.Show();
             OpenFileDialog open = new OpenFileDialog();
             open.Title = "Открыть";
@@ -212,8 +212,7 @@ namespace Graphedit
 
         private void BackSize_Click(object sender, EventArgs e)
         {
-            DrawForm subform = (DrawForm)this.ActiveMdiChild;
-            subform.SizeBack();
+            drawForms[lastform].SizeBack();
         }
 
         private void Help_Click(object sender, EventArgs e)
@@ -221,6 +220,8 @@ namespace Graphedit
             HelperForm heh = new HelperForm();
             heh.Show();
         }
+
+        
 
         private void updateTool()
         {
@@ -233,9 +234,111 @@ namespace Graphedit
             }
         }
 
+        private void красныйToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(drawForms.Count > 0)
+            drawForms[lastform].SetFilter(Color.Red);
+        }
+
+        private void синийToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count>0)
+                drawForms[lastform].SetFilter(Color.Blue);
+        }
+
+        private void желтыйToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+                drawForms[lastform].SetFilter(Color.Yellow);
+        }
+
+        private void фиолетовыйToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+                drawForms[lastform].SetFilter(Color.Violet);
+        }
+
+        private void произвольныйToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+            {
+                ColorDialog MyDialog = new ColorDialog();
+                MyDialog.ShowHelp = true;
+                if (MyDialog.ShowDialog() == DialogResult.OK)
+                    drawForms[lastform].SetFilter(MyDialog.Color);
+            }  
+        }
+
+        private void каскадомToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int c = 0;
+            for (int i = 0; i < drawForms.Count; i++)
+            {
+                if (drawForms[i] != null)
+                {
+                    drawForms[i].Location = new Point(c,c);
+                    c += 30;
+                }
+            }
+        }
+
+        private void слеваНаправоToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int allWidth = 0;
+            for (int i = 0; i < drawForms.Count; i++)
+            {
+                allWidth += drawForms[i].Width;
+            }
+            if(allWidth> Screen.PrimaryScreen.Bounds.Width)
+            {
+                int c = Screen.PrimaryScreen.Bounds.Width / (drawForms.Count+1);
+                for (int i = 0, g = 0; i < drawForms.Count; ++i, g += c)
+                {
+                    drawForms[i].Location = new Point(g,0);
+                }
+            }
+            else
+            {
+                for (int i = 0, g = 0; i < drawForms.Count; g += drawForms[i].Width,++i)
+                {
+                    drawForms[i].Location = new Point(g, 0);
+                }
+            }
+        }
+
+        private void снизуВверхToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LayoutMdi(MdiLayout.TileHorizontal);
+        }
+
+        private void упорядочитьЗначкиToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LayoutMdi(MdiLayout.ArrangeIcons);
+        }
+
         private void toolStripTextBox1_Click(object sender, EventArgs e)
         {
             
+        }
+        public void lastWind(int numb)
+        {
+            lastform = numb;
+        }
+        public void ClosingDraw(int num)
+        {
+            drawForms.RemoveAt(num);
+            for (int i = num; i < drawForms.Count; i++)
+            {
+                drawForms[i].ChangeNumb(i);
+            }
+        }
+        public void ShowForm(int Width,int Height)
+        {
+            DrawForm subform = new DrawForm(this, drawForms.Count,Width,Height);
+            lastform = drawForms.Count;
+            drawForms.Add(subform);
+            lastform = drawForms.Count;
+            subform.Show();
         }
     }
 }
