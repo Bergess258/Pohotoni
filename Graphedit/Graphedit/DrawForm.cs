@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,23 +15,23 @@ namespace Graphedit
     {
         int old_x,old_Y,curW,curH,bmpW,bmpH;
         Point curPos = new Point(0,0);
-        float currentScale = 1,sizeChangedW=1,sizeChangedH;
+        float currentScale = 1,sizeChangedW=1,sizeChangedH=1;
         static Color foreColor = Color.Black;
         static float lineWidth = 2;
         string selectedTool = "Pencil";
         public string fileName="";
         Pen pen = new Pen(foreColor, lineWidth);
         Pen er = new Pen(Color.White,lineWidth);
-        Bitmap bmp,tempBmp;
+        public Bitmap bmp,tempBmp;
         Graphics g;
-        bool ok = false;
-        int WindowNumb;
+        public int WindowNumb,realnumb;
 
         private Form1 parental;
         public DrawForm(Form1 par,int numb,int w,int h)
         {
             parental = par;
             WindowNumb = numb;
+            realnumb = numb;
             InitializeComponent();
             Text += " "+(numb+1);
             Width = w;
@@ -40,6 +41,7 @@ namespace Graphedit
         {
             parental = par;
             WindowNumb = numb;
+            realnumb = numb;
             InitializeComponent();
             Text += " " + (numb + 1);
         }
@@ -49,7 +51,6 @@ namespace Graphedit
             tempBmp = new Bitmap(bmp);
             pB.Image = bmp;
             g = Graphics.FromImage(bmp);
-            selectedTool = parental.selectedTool;
             curH = Height;
             curW = Width;
             bmpH = Height;
@@ -372,16 +373,18 @@ namespace Graphedit
         private void DrawForm_ResizeBegin(object sender, EventArgs e)
         {
             tempBmp = (Bitmap)bmp.Clone();
-            parental.lastWind(WindowNumb);
+            parental.lastWind(realnumb);
             curH = Height;
             curW = Width;
         }
 
-        private void DrawForm_FormClosing(object sender, FormClosingEventArgs e)
+        public void DrawForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            parental.ClosingDraw(WindowNumb);
+            Save save = new Save(fileName,realnumb,WindowNumb, parental,bmp);
+            bmp.Dispose();
+            tempBmp.Dispose();
+            save.Show();
         }
-
         public void Save()
         {
             bmp.Save(fileName);
@@ -397,9 +400,9 @@ namespace Graphedit
             tempBmp = new Bitmap(bmp);
             Width = tmp.Width+20;
             Height = tmp.Height+20;
+            g = Graphics.FromImage(bmp);
             pB.Image = bmp;
             pB.Refresh();
-            g = Graphics.FromImage(bmp);
         }
         public void setTool(string str,int stre,Color col)
         {
@@ -429,6 +432,140 @@ namespace Graphedit
         public void ChangeNumb(int num)
         {
             WindowNumb = num;
+        }
+        public void Func1()
+        {
+            int red, green, blue, DispX = 1, DispY=1;
+            Color pixel1, pixel2;
+            for (int i = 0; i < bmp.Height-2; ++i)
+            {
+                for (int j = 0; j < bmp.Width-2; ++j)
+                {
+                    pixel1 = bmp.GetPixel(j, i);
+                    pixel2 = bmp.GetPixel(j + DispX, i + DispY);
+                    red = Math.Min(Math.Abs(Convert.ToInt32(pixel1.R) - Convert.ToInt32(pixel2.R)) + 128, 255);
+                    green = Math.Min(Math.Abs(Convert.ToInt32(pixel1.G) - Convert.ToInt32(pixel2.G)) + 128, 255);
+                    blue = Math.Min(Math.Abs(Convert.ToInt32(pixel1.B) - Convert.ToInt32(pixel2.B)) + 128, 255);
+                    bmp.SetPixel(j, i, Color.FromArgb(red, green, blue));
+                }
+            }
+            pB.Image = bmp;
+            pB.Refresh();
+        }
+        public void Func2()
+        {
+            int red, green, blue, DX = 1, DY = 1;
+            Bitmap t = (Bitmap)bmp.Clone();
+            for (int i = DX; i < bmp.Height - 1-DX; ++i)
+            {
+                for (int j = DY; j < bmp.Width - 1-DY; ++j)
+                {
+                    red = (int)(Convert.ToInt32(t.GetPixel(j, i).R) + 0.5 * Convert.ToInt32((t.GetPixel(j, i).R) - Convert.ToInt32(t.GetPixel(j - DX, i - DY).R)));
+                    green = (int)(Convert.ToInt32(t.GetPixel(j, i).G) + 0.7 * Convert.ToInt32((t.GetPixel(j, i).G) - Convert.ToInt32(t.GetPixel(j - DX, i - DY).G)));
+                    blue = (int)(Convert.ToInt32(t.GetPixel(j, i).B) + 0.5 * Convert.ToInt32((t.GetPixel(j, i).B - Convert.ToInt32(t.GetPixel(j - DX, i - DY).B))));
+                    red = Math.Min(Math.Max(red, 0), 255);
+                    green = Math.Min(Math.Max(green, 0), 255);
+                    blue = Math.Min(Math.Max(blue, 0), 255);
+                    bmp.SetPixel(j, i, Color.FromArgb(red, green, blue));
+
+                }
+            }
+            pB.Image = bmp;
+            pB.Refresh();
+        }
+        public void Func3()
+        {
+            int red, green, blue, DX = 1, DY = 1;
+            for (int i = DX; i < bmp.Height - 1 - DX; ++i)
+            {
+                for (int j = DY; j < bmp.Width - 1 - DY; ++j)
+                {
+                    red = Convert.ToInt32((Convert.ToInt32(bmp.GetPixel(j - 1, i - 1).R) + 
+                            Convert.ToInt32(bmp.GetPixel(j - 1, i).R) + 
+                            Convert.ToInt32(bmp.GetPixel(j - 1, i + 1).R) + 
+                            Convert.ToInt32(bmp.GetPixel(j, i - 1).R) + 
+                            Convert.ToInt32(bmp.GetPixel(j, i).R) + 
+                            Convert.ToInt32(bmp.GetPixel(j, i + 1).R) + 
+                            Convert.ToInt32(bmp.GetPixel(j + 1, i - 1).R) + 
+                            Convert.ToInt32(bmp.GetPixel(j + 1, i).R) + 
+                            Convert.ToInt32(bmp.GetPixel(j + 1, i + 1).R)) / 9);
+
+                    green = Convert.ToInt32((Convert.ToInt32(bmp.GetPixel(j - 1, i - 1).G) +
+                            Convert.ToInt32(bmp.GetPixel(j - 1, i).G) +
+                            Convert.ToInt32(bmp.GetPixel(j - 1, i + 1).G) +
+                            Convert.ToInt32(bmp.GetPixel(j, i - 1).G) +
+                            Convert.ToInt32(bmp.GetPixel(j, i).G) +
+                            Convert.ToInt32(bmp.GetPixel(j, i + 1).G) +
+                            Convert.ToInt32(bmp.GetPixel(j + 1, i - 1).G) +
+                            Convert.ToInt32(bmp.GetPixel(j + 1, i).G) +
+                            Convert.ToInt32(bmp.GetPixel(j + 1, i + 1).G)) / 9);
+
+                    blue = Convert.ToInt32((Convert.ToInt32(bmp.GetPixel(j - 1, i - 1).B) +
+                            Convert.ToInt32(bmp.GetPixel(j - 1, i).B) +
+                            Convert.ToInt32(bmp.GetPixel(j - 1, i + 1).B) +
+                            Convert.ToInt32(bmp.GetPixel(j, i - 1).B) +
+                            Convert.ToInt32(bmp.GetPixel(j, i).B) +
+                            Convert.ToInt32(bmp.GetPixel(j, i + 1).B) +
+                            Convert.ToInt32(bmp.GetPixel(j + 1, i - 1).B) +
+                            Convert.ToInt32(bmp.GetPixel(j + 1, i).B) +
+                            Convert.ToInt32(bmp.GetPixel(j + 1, i + 1).B)) / 9);
+                    red = Math.Min(Math.Max(red, 0), 255);
+                    green = Math.Min(Math.Max(green, 0), 255);
+                    blue = Math.Min(Math.Max(blue, 0), 255);
+                    bmp.SetPixel(j, i, Color.FromArgb(red, green, blue));
+                }
+            }
+            pB.Image = bmp;
+            pB.Refresh();
+        }
+        public void Func4()
+        {
+            int red, green, blue, DX, DY;
+            Random rand = new Random();
+            for (int i = 3; i < bmp.Height - 3; ++i)
+            {
+                for (int j = 3; j < bmp.Width - 3; ++j)
+                {
+                    DX = rand.Next((bmp.Width-j)/4) * 4 - 2;
+                    DY = rand.Next((bmp.Height - i) / 4) * 4 - 2;
+                    red = bmp.GetPixel(j + DX, i + DY).R;
+                    green = bmp.GetPixel(j + DX, i + DY).G;
+                    blue = bmp.GetPixel(j + DX, i + DY).B;
+                    bmp.SetPixel(j, i, Color.FromArgb(red, green, blue));
+                }
+            }
+            pB.Image = bmp;
+            pB.Refresh();
+        }
+        public void RotateLeft()
+        {
+            bmp.RotateFlip(RotateFlipType.Rotate270FlipNone);
+            bmp = new Bitmap(bmp, new Size(pB.Height * pB.Image.Width / pB.Image.Height, bmp.Height));
+            pB.Image = bmp;
+            pB.Refresh();
+            g = Graphics.FromImage(bmp);
+        }
+        public void RotateRight()
+        {
+            bmp.RotateFlip(RotateFlipType.Rotate90FlipNone);
+            bmp = new Bitmap(bmp, new Size(pB.Height * pB.Image.Width / pB.Image.Height, bmp.Height));
+            pB.Image = bmp;
+            pB.Refresh();
+            g = Graphics.FromImage(bmp);
+        }
+        public void FlipH()
+        {
+            bmp.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            pB.Image = bmp;
+            pB.Refresh();
+            g = Graphics.FromImage(bmp);
+        }
+        public void FlipV()
+        {
+            bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            pB.Image = bmp;
+            pB.Refresh();
+            g = Graphics.FromImage(bmp);
         }
     }
 }

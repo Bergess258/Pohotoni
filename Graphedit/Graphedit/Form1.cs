@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -12,11 +13,11 @@ namespace Graphedit
 {
     public partial class Form1 : Form
     {
-        public string selectedTool = "Pencil";
+        string selectedTool = "Pencil";
         int valueP=2,valueM=200,value=2;
         Color color = Color.Black;
         int lastform = 0;
-        List<DrawForm> drawForms = new List<DrawForm>();
+        public List<DrawForm> drawForms = new List<DrawForm>();
         public Form1()
         {
             InitializeComponent();
@@ -36,19 +37,23 @@ namespace Graphedit
 
         private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DrawForm subform = (DrawForm)this.ActiveMdiChild;
-            if (subform.fileName != "")
+            if (drawForms.Count > 0)
             {
-                SaveFileDialog save = new SaveFileDialog();
-                save.Title = "Сохранить";
-                save.Filter = "Bitmap (*.bmp)|*.bmp| Jpeg (*.jpeg)|*.jpeg| Все файлы (*.*)|*.*";
-                if (save.ShowDialog() == DialogResult.OK)
+                if (drawForms[lastform].fileName == "")
                 {
-                    ((DrawForm)this.ActiveMdiChild).Save(save.FileName);
+                    SaveFileDialog save = new SaveFileDialog();
+                    save.Title = "Сохранить";
+                    save.Filter = "Bitmap (*.bmp)|*.bmp| Jpeg (*.jpeg)|*.jpeg| Все файлы (*.*)|*.*";
+                    if (save.ShowDialog() == DialogResult.OK)
+                    {
+                        drawForms[lastform].Save(save.FileName);
+                    }
                 }
+                else
+                    drawForms[lastform].Save();
             }
             else
-                subform.Save();
+                MessageBox.Show("Нечего сохранять");
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -63,15 +68,15 @@ namespace Graphedit
 
         private void открытьToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DrawForm subform = new DrawForm(this, drawForms.Count);
-            lastform = drawForms.Count;
-            drawForms.Add(subform);
-            subform.Show();
             OpenFileDialog open = new OpenFileDialog();
             open.Title = "Открыть";
             open.Filter= "Bitmap (*.bmp)|*.bmp| Jpeg (*.jpeg)|*.jpeg| PNG (*.png)|*.png| Все файлы (*.*)|*.*";
             if (open.ShowDialog() == DialogResult.OK)
             {
+                DrawForm subform = new DrawForm(this, drawForms.Count);
+                lastform = drawForms.Count;
+                drawForms.Add(subform);
+                subform.Show();
                 subform.Open(open.FileName);
             }
         }
@@ -220,9 +225,6 @@ namespace Graphedit
             HelperForm heh = new HelperForm();
             heh.Show();
         }
-
-        
-
         private void updateTool()
         {
             for (int i = 0; i < drawForms.Count; ++i)
@@ -308,7 +310,26 @@ namespace Graphedit
 
         private void снизуВверхToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LayoutMdi(MdiLayout.TileHorizontal);
+            int allWidth = 0;
+            for (int i = 0; i < drawForms.Count; i++)
+            {
+                allWidth += drawForms[i].Height;
+            }
+            if (allWidth > Screen.PrimaryScreen.Bounds.Width)
+            {
+                int c = Screen.PrimaryScreen.Bounds.Height / (drawForms.Count + 2);
+                for (int i = 0, g = 0; i < drawForms.Count; ++i, g += c)
+                {
+                    drawForms[i].Location = new Point(0, g);
+                }
+            }
+            else
+            {
+                for (int i = 0, g = 0; i < drawForms.Count; g += drawForms[i].Height, ++i)
+                {
+                    drawForms[i].Location = new Point(0, g);
+                }
+            }
         }
 
         private void упорядочитьЗначкиToolStripMenuItem_Click(object sender, EventArgs e)
@@ -324,20 +345,108 @@ namespace Graphedit
         {
             lastform = numb;
         }
-        public void ClosingDraw(int num)
+
+        private void function1ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+                drawForms[lastform].Func1();
+        }
+
+        private void функция2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+                drawForms[lastform].Func2();
+        }
+
+        private void function3ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+                drawForms[lastform].Func3();
+        }
+
+        private void diffuseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+                drawForms[lastform].Func4();
+        }
+
+        private void сохранитьКакToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+            {
+                SaveFileDialog save = new SaveFileDialog();
+                save.Title = "Сохранить";
+                save.Filter = "Bitmap (*.bmp)|*.bmp| Jpeg (*.jpeg)|*.jpeg| Все файлы (*.*)|*.*";
+                if (save.ShowDialog() == DialogResult.OK)
+                {
+                    drawForms[lastform].Save(save.FileName);
+                }
+            }
+            else
+                MessageBox.Show("Нечего сохранять");
+        }
+
+        private void rotateLeftToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(drawForms.Count>0)
+                drawForms[lastform].RotateLeft();
+        }
+
+        private void rotateRightToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+                drawForms[lastform].RotateRight();
+        }
+
+        private void flipHToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+                drawForms[lastform].FlipH();
+        }
+
+        private void flipVToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (drawForms.Count > 0)
+                drawForms[lastform].FlipV();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (drawForms.Count == 0) kk = true;
+            for (int i = 0; i < drawForms.Count;++i)
+            {
+                drawForms[i].Close();
+            }
+            if(!kk)
+            e.Cancel = true;
+            kk = true;
+        }
+        static bool kk = false;
+        public void RemoveForm(int num)
         {
             drawForms.RemoveAt(num);
+            if (kk == true && drawForms.Count == 0) Close();
             for (int i = num; i < drawForms.Count; i++)
             {
-                drawForms[i].ChangeNumb(i);
+                --drawForms[num].realnumb;
             }
+        }
+
+        private void выходToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+
         }
         public void ShowForm(int Width,int Height)
         {
             DrawForm subform = new DrawForm(this, drawForms.Count,Width,Height);
             lastform = drawForms.Count;
+            subform.setTool(selectedTool,value,color);
             drawForms.Add(subform);
-            lastform = drawForms.Count;
             subform.Show();
         }
     }
